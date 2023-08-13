@@ -8,7 +8,6 @@ class User {
     this.email = email;
     this.password = password;
     this.currency = currency;
-    this.balance = balance || 0;
   }
 }
 
