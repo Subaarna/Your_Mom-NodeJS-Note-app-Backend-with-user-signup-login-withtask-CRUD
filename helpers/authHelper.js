@@ -110,8 +110,8 @@ function GetIdFromAccessToken(req) {
 
 
 
-// const testToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NGQ4ODllMTYzYmRhZDMyMzkxM2M5ZWYiLCJyb2xlIjoidXNlciIsImV4cCI6MTY5MjAwMjE1MiwiaWF0IjoxNjkxOTE1NzUyfQ.yRYEkXeW28WpnNO6hh8OJJw7yppBX3YC-JBkUuhb6ns";
-// const mockReq = { headers: { authorization: testToken } };
+const testToken = "Bearer (yourtoken)";
+const mockReq = { headers: { authorization: testToken } };
 
 // try {
 //   const userId = GetIdFromAccessToken(mockReq);
