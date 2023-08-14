@@ -8,8 +8,8 @@ const bcrypt = require('bcrypt');
 const { promisify } = require('util');
 const sleep = promisify(setTimeout);
 const { ObjectId } = require('mongodb');
-const { message } = require("statuses");
-const { error } = require("console");
+// const { message } = require("statuses");
+// const { error } = require("console");
 
 
 const posts = [
@@ -85,6 +85,25 @@ async function login(req, res) {
       console.error('Error during login:', error);
       return res.json({ error: 'Internal server error' });
   }
+}
+
+async function deleteUser(req,res){
+  try{
+  const userCollection = await openCollection("users");
+  // const accessTokenId = GetIdFromAccessToken(req);
+
+  const{userId} = req.body;
+  // searching the user based on the id and deleting it
+  const result = await userCollection.findOneAndDelete({_id:new ObjectId(userId)});
+if(result.value){
+  return res.status(200).json({message:"User deleted successfully"});
+}else{
+  return res.status(501).json({message:"Cannot find or delete user"});
+}
+
+}catch(error){
+  return res.json("Internal server error.");
+}
 }
 
 async function addTask(req, res) {
@@ -211,5 +230,5 @@ module.exports = {
 addTask,
 updateTask,
 getAllTasks,
-deleteTask
-};
+deleteTask,
+deleteUser}

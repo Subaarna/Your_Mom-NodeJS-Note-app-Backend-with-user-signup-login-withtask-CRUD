@@ -16,6 +16,7 @@ router.post('/addtask',userController.addTask);
 router.put('/updatetask', userController.updateTask);
 router.get('/getalltask', userController.getAllTasks);
 router.delete('/deletetask', userController.deleteTask);
+router.delete('/deleteuser', userController.deleteUser);
 
 
 
