@@ -2,12 +2,11 @@ const { ObjectId } = require('mongodb');
 
 
 class User {
-  constructor(email, password, currency, balance) {
+  constructor(userName, email, password) {
     this._id = new ObjectId();
-
+    this.userName = userName;
     this.email = email;
     this.password = password;
-    this.currency = currency;
   }
 }
 
