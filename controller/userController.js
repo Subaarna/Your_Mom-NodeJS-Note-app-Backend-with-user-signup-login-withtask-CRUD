@@ -1,5 +1,6 @@
 const  openCollection = require("../database/databaseConnection");
 const User = require("../models/userModel").User;
+const UserLogin = require("../models/userModel").UserLogin;
 const Tasks = require("../models/tasksModel").Tasks;
 const GenerateAccessToken = require("../helpers/authHelper").GenerateAccessToken;
 const GenerateRefreshToken = require("../helpers/authHelper").GenerateRefreshToken;
@@ -8,6 +9,7 @@ const bcrypt = require('bcrypt');
 const { promisify } = require('util');
 const sleep = promisify(setTimeout);
 const { ObjectId } = require('mongodb');
+const objectInspect = require("object-inspect");
 // const { message } = require("statuses");
 // const { error } = require("console");
 
@@ -60,7 +62,7 @@ async function login(req, res) {
   try {
       const userCollection = await openCollection("users");
 
-      const user = new User(req.body.email, req.body.password);
+      const user = new UserLogin(req.body.email, req.body.password);
       const existingUser = await userCollection.findOne({ email: user.email });
       if (!existingUser) {
           return res.json({ message: "User with this email does not exist" });
@@ -70,8 +72,7 @@ async function login(req, res) {
       if (!isPasswordValid) {
           return res.json({ message: "Invalid password" });
       }
-        console.log('existingUser._id:', existingUser._id); // Add this line for debugging
-
+        console.log('existingUser._id:', existingUser._id);
       const accessToken = GenerateAccessToken(existingUser._id.toHexString());
       const refreshToken = GenerateRefreshToken(existingUser._id.toHexString());
 
@@ -87,6 +88,7 @@ async function login(req, res) {
       return res.json({ error: 'Internal server error' });
   }
 }
+
 
 async function deleteUser(req,res){
   try{
@@ -222,7 +224,59 @@ async function deleteTask(req, res) {
   }
 }
 
+async function uploadProfile(req, res) {
+  try {
+    const userCollection = await openCollection('users');
+  
+    const accessTokenId = GetIdFromAccessToken(req);
 
+    const user = await userCollection.findOne({ _id: new ObjectId(accessTokenId) });
+    if (!user) {
+      return res.json("User not found");
+    }
+    
+    user.profilePicture = req.file.filename;
+
+    // Update the user document
+    const result = await userCollection.updateOne(
+      { _id: new ObjectId(accessTokenId) },
+      { $set: { profilePicture: user.profilePicture } }
+    );
+
+    if (result.acknowledged && result.modifiedCount > 0) {
+      return res.status(200).json({ message: 'Profile picture uploaded successfully' });
+    } else {
+      throw new Error('Failed to upload profile picture');
+    }
+  } catch (error) {
+    console.error('Error uploading profile picture:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+async function getProfilePicture(req, res) {
+  try {
+    const userCollection = await openCollection("users");
+    const accessTokenId = GetIdFromAccessToken(req);
+
+    const user = await userCollection.findOne({ _id: new ObjectId(accessTokenId) });
+
+    if (!user || !user.profilePicture) {
+      return res.status(404).json({ message: "Profile picture not found" });
+    }
+
+    const picturePath = path.join(__dirname, "../uploads", user.profilePicture);
+
+    if (!fs.existsSync(picturePath)) {
+      return res.status(404).json({ message: "Profile picture not found" });
+    }
+
+    res.sendFile(picturePath);
+  } catch (error) {
+    console.error("Error fetching profile picture:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
 
 module.exports = {
   posts,
@@ -232,4 +286,7 @@ addTask,
 updateTask,
 getAllTasks,
 deleteTask,
-deleteUser}
+deleteUser,
+uploadProfile,
+getProfilePicture
+}
