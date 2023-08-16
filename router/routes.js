@@ -21,6 +21,8 @@ router.post('/upload-profile-picture', upload.single('profilePicture'), userCont
 
 router.get("/profile-picture/:userId", userController.getProfilePicture);
 
+router.get("/getuser", userController.getUserByAuth);
+router.get("/getAllUsers", userController.getAllUsers);
 
 
 
