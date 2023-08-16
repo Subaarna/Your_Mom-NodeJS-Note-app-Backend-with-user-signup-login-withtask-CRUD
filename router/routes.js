@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const posts = require("../controller/userController");
 const userController = require('../controller/userController');
-const upload = require ('../helpers/profilePic');
+const upload = require ('../helpers/profileHelper');
 
 
 router.get('/posts', (req, res) => {

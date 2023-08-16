@@ -10,6 +10,8 @@ const { promisify } = require('util');
 const sleep = promisify(setTimeout);
 const { ObjectId } = require('mongodb');
 const objectInspect = require("object-inspect");
+const path = require("path");
+const fs = require("fs");
 // const { message } = require("statuses");
 // const { error } = require("console");
 
@@ -254,6 +256,7 @@ async function uploadProfile(req, res) {
   }
 }
 
+
 async function getProfilePicture(req, res) {
   try {
     const userCollection = await openCollection("users");
@@ -271,12 +274,17 @@ async function getProfilePicture(req, res) {
       return res.status(404).json({ message: "Profile picture not found" });
     }
 
-    res.sendFile(picturePath);
+    // Set the appropriate content type for the response
+    res.setHeader('Content-Type', 'image/jpeg'); // Change 'image/jpeg' to the appropriate content type
+
+    // Read the image file and send it as the response
+    fs.createReadStream(picturePath).pipe(res);
   } catch (error) {
     console.error("Error fetching profile picture:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
 
 module.exports = {
   posts,
