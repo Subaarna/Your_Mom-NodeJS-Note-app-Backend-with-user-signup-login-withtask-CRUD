@@ -311,6 +311,7 @@ async function getProfilePicture(req, res) {
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
 async function getUserByAuth(req, res) {
   try {
     const userCollection = await openCollection("users");

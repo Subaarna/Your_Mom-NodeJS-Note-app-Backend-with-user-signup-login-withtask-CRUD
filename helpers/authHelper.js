@@ -17,7 +17,7 @@ function GenerateAccessToken(userID) {
     const expirationTime = Math.floor(Date.now() / 1000) + accessTokenDuration;
     const claims = {
       sub: userID,
-      role: "user", // Add role claim here
+      role: "user", 
       exp: expirationTime,
     };
     const token = jwt.sign(claims, secretKey, { algorithm: "HS256" });
