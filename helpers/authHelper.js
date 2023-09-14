@@ -70,10 +70,12 @@ function IsAuthenticated(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header missing" });
+      return res.status(401).json({ message: "You are not authorized" });
     }
 
-    const tokenString = authHeader.split("Bearer")[1];
+    const tokenString = authHeader.split("Bearer ")[1];
+    console.log("Received token:", tokenString); // Log the token for debugging
+
     const token = jwt.verify(tokenString, secretKey);
 
     if (!token) {
@@ -83,8 +85,9 @@ function IsAuthenticated(req, res, next) {
   } catch (error) {
     console.error("Error authenticating:", error);
     return res.status(500).json({ message: "Internal server error" });
-  }
+  } 
 }
+
 function GetIdFromAccessToken(req) {
   try {
     const authHeader = req.headers.authorization;

@@ -15,6 +15,7 @@ const { ObjectId } = require("mongodb");
 const objectInspect = require("object-inspect");
 const path = require("path");
 const fs = require("fs");
+const IsAuthenticated = require("../helpers/authHelper").IsAuthenticated;
 // const { message } = require("statuses");
 // const { error } = require("console");
 
@@ -326,16 +327,23 @@ async function getUserByAuth(req, res) {
     res.json("Internal server error");
   }
 }
-async function getAllUsers(req, res){
-  try{
-  const userCollection = await openCollection("users");
-  const users = await userCollection.find().sort({_id:-1}).toArray();
-  
-  return res.json(users);
-}catch (error){
-  console.log("couldnot retrieve users");
-  res.status(500).json({error:"Internal server error"});
-}
+async function getAllUsers(req, res) {
+  try {
+    
+    IsAuthenticated(req, res, async function (err) {//the function(err) is a callback function that checks if it worked properly or not
+      if (err) {
+        return res.status(401).json({ message: "Authentication failed" });
+      }
+
+      const userCollection = await openCollection("users");
+      const users = await userCollection.find().sort({ _id: -1 }).toArray();
+
+      return res.json(users);
+    });
+  } catch (error) {
+    console.log("could not retrieve users");
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
 
 module.exports = {
